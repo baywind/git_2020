@@ -3,6 +3,6 @@ print("Oops!")
 # cooment
 
 'ljkjhh' \
-'sadlchjbljhba' \
+'goodbye' \
 'alkdsbcaldbc'
 # hbjehbcw334
