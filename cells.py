@@ -1,11 +1,18 @@
 import pygame
 
+class Cell:
+    open = False
+    mine = False
+
+    def __bool__(self):
+        return self.mine
+
 class Board:
     # создание поля
     def __init__(self, width, height):
         self.width = width
         self.height = height
-        self.board = [[0] * width for _ in range(height)]
+        self.board = [[Cell() for _ in range(width)] for _ in range(height)]
         # значения по умолчанию
         self.left = 10
         self.top = 10
@@ -24,7 +31,7 @@ class Board:
             for cell in row:
                 pygame.draw.rect(screen, (255, 255, 255),
                                  (x, y, self.cell_size, self.cell_size), 1)
-                if cell:
+                if cell.mine:
                     pygame.draw.rect(screen, (0, 255, 0),
                                      (x + 2, y + 2, self.cell_size - 4, self.cell_size - 4), )
 
@@ -53,7 +60,7 @@ class Board:
         total = 0
         for row in rows:
             cells = row[max(0, x-1):x+2]
-            total += sum(cells)
+            total += sum(map(bool, cells))
         return total
 
     def next_generation(self):
@@ -82,14 +89,17 @@ while running:
         if event.type == pygame.MOUSEMOTION:
             mouse = event.pos
         if event.type == pygame.MOUSEBUTTONDOWN:
-            try:
-                cell = board.get_cell(event.pos)
-                # print(board.neighbours(*cell))
-                board[cell] = not board[cell]
-            except IndexError:
-                print("Мимо!")
-        if event.type == pygame.KEYDOWN:
-            board.next_generation()
+            cell = board.get_cell(event.pos)
+            if event.button == 3:
+                try:
+                    # print(board.neighbours(*cell))
+                    board[cell].mine = not board[cell].mine
+                except IndexError:
+                    print("Мимо!")
+            elif event.button == 1:
+                print(board.neighbours(*cell))
+        # if event.type == pygame.KEYDOWN:
+        #     board.next_generation()
 
     screen.fill((0, 0, 0))
     board.render(screen)

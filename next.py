@@ -1,26 +1,22 @@
 import pygame
 
-
-sch = 0
-if False and __name__ == '__main__':
-    c = input().split(" ")
-    b = c[1]
-    a = c[0]
+if __name__ == '__main__':
     try:
-        a = int(a)
-        b = int(b)
-    except ValueError:
-        print("Неправильный формат ввода")
-        sch = 1
-        pygame.quit()
-    if sch == 0:
+        w, n = map(int, input().split())
+        if w == 0:
+            raise ValueError
+    except:
+        print('Неправильный формат ввода')
+    else:
         pygame.init()
-        size = width, height = a, b
-        screen = pygame.display.set_mode(size)
+        size = x, x = w * n * 2 + 1, w * n * 2 + 1
+        scr = pygame.display.set_mode(size)
+        pygame.display.set_caption('Вы же не снизите за цвета флага Российской Империи, верно?')
+        while pygame.event.wait().type != pygame.QUIT:
+            scr.fill((255, 255, 255))
+            for i in range(n):
+                clr = ['black', 'orange', 'white']
+                pygame.draw.circle(scr, pygame.Color(clr[i % 3]), (x // 2 + 1, x // 2 + 1), w * (n - i))
+            pygame.display.flip()
 
-if sch == 0:
-    pygame.draw.rect(screen, (255, 0, 0), (1, 1, a - 2, b - 2), 0)
-    pygame.display.flip()
-    while pygame.event.wait().type != pygame.QUIT:
-        pass
-pygame.quit()
+        pygame.quit()
