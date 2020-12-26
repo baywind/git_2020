@@ -1,11 +1,28 @@
 import pygame
-import os, math
+import os, math, random
 
 pygame.init()
 pygame.display.set_caption('Спрайты')
 size = width, height = 600, 600
 screen = pygame.display.set_mode(size)
 screen.fill((200, 200, 0))
+
+balls = pygame.sprite.Group()
+
+class Ball(pygame.sprite.Sprite):
+    def __init__(self, x, y, r=10):
+        super().__init__(all_sprites, balls)
+        self.image = pygame.Surface((r*2, r*2), flags=pygame.SRCALPHA)
+        pygame.draw.circle(self.image,(255,0,0),(r,r),r)
+        self.rect = pygame.Rect(x - r, y - r, r*2, r*2)
+        self.vx = random.randint(-5,5)
+        self.vy = random.randint(-5, 5)
+        self.radius = r
+        self.mask = pygame.mask.from_surface(self.image)
+
+    def update(self, pos):
+        self.rect = self.rect.move(self.vx, self.vy)
+
 
 class Zombie(pygame.sprite.Sprite):
     path = os.path.join('images', "zombie.png")
@@ -24,6 +41,7 @@ class Zombie(pygame.sprite.Sprite):
         self.v = v
         self.a = 0
         self.rect = pygame.Rect(self.pos(),(self.newidth, self.newhight))
+        self.mask = pygame.mask.from_surface(self.image)
 
     def pos(self):
         x = self.center[0] + self.r * math.cos(self.a) - self.newidth // 2
@@ -36,6 +54,11 @@ class Zombie(pygame.sprite.Sprite):
         self.rect.y = self.center[1] + self.r * math.sin(self.a) - self.newhight // 2
         if pos and self.rect.collidepoint(pos):
             self.v = -self.v
+            self.image = pygame.transform.flip(self.image,True,False)
+        if pygame.sprite.spritecollide(self,
+                        balls, True, collided=pygame.sprite.collide_mask):
+            # pygame.transform.flip(self.image, False, True)
+            screen.fill((0, 0, 0))
 
 
 
@@ -47,7 +70,7 @@ all_sprites = pygame.sprite.Group()
 
 monsters = pygame.sprite.Group()
 
-zomb = Zombie((300,300), 150, 0.1, all_sprites, monsters)
+zomb = Zombie((300,300), 150, 0.01, all_sprites, monsters)
 
 
 while running:
@@ -57,12 +80,14 @@ while running:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             pos = event.pos
+            if event.button == 3:
+                Ball(*event.pos, 10)
 
     screen.fill((0, 200, 200))
-    all_sprites.draw(screen)
     clock.tick(fps)
+    all_sprites.update(pos)
+    all_sprites.draw(screen)
     pygame.display.flip()
 
-    monsters.update(pos)
 
 pygame.quit()
